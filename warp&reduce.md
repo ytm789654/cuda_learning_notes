@@ -204,8 +204,8 @@ __global__ void reduce(float *gdata, float *out, long long N){
         sdata[warpId] = val;
     __syncthreads();    //确保不同warp的同步
     if(warpId == 0){
+        val = (tid < shufOffset)?sdata[tid] : 0;
         for(int shufOffset = warpSize/2; shufOffset > 0; shufOffset >>= 1){//其实可以把mask和offset写的更精细 偷懒复用一下代码^_^
-            val = (tid > shufOffset)?sdata[tid] : 0;
             float tmp = __shfl_down_sync(allThreadMask, val, shufOffset);
             val += tmp;
         }
